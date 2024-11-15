@@ -65,8 +65,8 @@ class ArtificialSimplex:
                   'отрицательные')
             self.flag = True
             return True
-        self.Cj_arr[qind] = self.f_list[ind + 1]
         self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
+        self.Cj_arr[qind] = self.f_list[ind + 1]
         print(f"Вектор A{self.basis[qind]} покидает базис")
         print(f"Вектор A{ind + 1} вводится в новый базис")
         self.basis[qind] = ind + 1
