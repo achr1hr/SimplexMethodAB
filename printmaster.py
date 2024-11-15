@@ -1,6 +1,6 @@
 from tabulate import tabulate
 
-
+inf = 999999
 class SimplexTablePrinter:
     def __init__(self, f_list, tab, basis, cj_arr, deltarr):
         self.out_hed = ['Cj', ''] + f_list + ['']
@@ -40,3 +40,16 @@ class SimplexTablePrinter:
             self.out_tab[i][2:-1] = self.rounderarr(tab[i - 1])
             self.out_tab[i][-1] = self.rounder(qarr[i - 1])
         self.out_tab[-1][2:] = self.rounderarr(delarr)
+
+    def print_solution(self, tab, basis, f_list, deltarr):
+        print('Базисное решение:', end=' ')
+        basis_solut = [0] * (len(tab[0]) - 1)
+        for i in range(len(basis)):
+            basis_solut[basis[i] - 1] = self.rounder(tab[i][0])
+        print('(', *basis_solut, ')', sep=' ')
+        for i in range(1, len(f_list)):
+            if f_list[i] == inf and basis_solut[i - 1] != 0:
+                print('Задача не имеет решения, так как в решении используется искусственная '
+                      'переменная')
+                return
+        print(f'F = {self.rounder(deltarr[0])}')

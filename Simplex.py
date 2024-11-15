@@ -24,12 +24,15 @@ class ArtificialSimplex:
         self.iter = 1
         self.out_tab = SimplexTablePrinter(self.f_list, self.tab, self.basis, self.Cj_arr,
                                            self.deltarr)
+        self.flag = False
 
     def solve_simplex(self):
         while self.iteration() is not True:
             continue
         print('Итоговая сиплекс-таблица:')
         self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
+        if self.flag is not True:
+            self.out_tab.print_solution(self.tab, self.basis, self.f_list, self.deltarr)
 
     def iteration(self):
         print(f'Итерация {self.iter}:')
@@ -58,7 +61,9 @@ class ArtificialSimplex:
 
         qind, qval = min(enumerate(self.qarr), key=lambda pair: pair[1])
         if qval == inf:
-            print('Задача не может быть решена, так как все члены разрешающего столбца отрицательные')
+            print('Задача не может быть решена, так как все члены разрешающего столбца '
+                  'отрицательные')
+            self.flag = True
             return True
         self.Cj_arr[qind] = self.f_list[ind + 1]
         self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
