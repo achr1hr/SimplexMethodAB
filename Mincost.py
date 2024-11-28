@@ -1,4 +1,3 @@
-from traceback import print_tb, print_stack
 
 from tabulate import tabulate
 
