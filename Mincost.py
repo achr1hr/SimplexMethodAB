@@ -74,8 +74,6 @@ class Mincost:
                     printab[-1][j + 1] = self._cons[j]
                 printab[i + 1][j + 1] = f'{self._tab[i][j]}|{self._plan[i][j]}'
                 summa += self._tab[i][j] * self._plan[i][j]
-                if self._plan[i][j]!=0:
-                    count+=1
         for i in range(1, len(printab[0])):
             printab[0][i] = f'B{i}'
             if i == len(printab[0]) - 1:
