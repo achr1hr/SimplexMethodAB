@@ -13,6 +13,7 @@ class ArtificialSimplex:
             self.tab[i].append(int(tab[i][-1]))
             for j in range(len(tab[i]) - 2):
                 self.tab[i].append(float(tab[i][j]))
+        self.columns = len(self.tab[0])-1
         self.f_list = [0] + f_list
         self.Cj_arr = [0] * self.leng
         self.basis = [0] * self.leng
@@ -25,17 +26,29 @@ class ArtificialSimplex:
         self.out_tab = SimplexTablePrinter(self.f_list, self.tab, self.basis, self.Cj_arr,
                                            self.deltarr)
         self.flag = False
+        self._showsteps = True
+
+    def get_solution(self):
+        self._showsteps = False
+        self.solve_simplex()
+        basis_solut = [0] * (len(self.tab[0]) - 1)
+        for i in range(len(self.basis)):
+            basis_solut[self.basis[i] - 1] = self.out_tab.rounder(self.tab[i][0])
+        basis_solut = basis_solut[:self.columns]
+        return basis_solut, self.out_tab.rounder(self.deltarr[0]), not self.flag
 
     def solve_simplex(self):
         while self.iteration() is not True:
             continue
-        print('Итоговая сиплекс-таблица:')
-        self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
-        if self.flag is not True:
+        if self._showsteps:
+            print('Итоговая сиплекс-таблица:')
+            self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
+        if self.flag is not True and self._showsteps:
             self.out_tab.print_solution(self.tab, self.basis, self.f_list, self.deltarr)
 
     def iteration(self):
-        print(f'Итерация {self.iter}:')
+        if self._showsteps:
+            print(f'Итерация {self.iter}:')
         for i in range(len(self.tab[0])):
             self.deltarr[i] = sum(
                 self.tab[j][i] * self.f_list[self.basis[j]] for j in range(len(self.basis))) - \
@@ -43,15 +56,19 @@ class ArtificialSimplex:
         if self.mmin == 'max':
             ind, val = min(enumerate(self.deltarr[1:]), key=lambda pair: pair[1])
             if val >= 0:
-                print("План оптимален, так как все дельты положительные\n")
+                if self._showsteps:
+                    print("План оптимален, так как все дельты положительные\n")
                 return True
-            print(f'План не оптимален, так как del{ind + 1} = {val} отрицательна')
+            if self._showsteps:
+                print(f'План не оптимален, так как del{ind + 1} = {val} отрицательна')
         else:
             ind, val = max(enumerate(self.deltarr[1:]), key=lambda pair: pair[1])
             if val <= 0:
-                print("План оптимален, так как все дельты отрицательные\n")
+                if self._showsteps:
+                    print("План оптимален, так как все дельты отрицательные\n")
                 return True
-            print(f'План не оптимален, так как del{ind + 1} = {val} положительна')
+            if self._showsteps:
+                print(f'План не оптимален, так как del{ind + 1} = {val} положительна')
 
         for i in range(self.leng):
             if (self.tab[i][ind + 1] > 0):
@@ -61,17 +78,21 @@ class ArtificialSimplex:
 
         qind, qval = min(enumerate(self.qarr), key=lambda pair: pair[1])
         if qval == inf:
-            print('Задача не может быть решена, так как все члены разрешающего столбца '
+            if self._showsteps:
+                print('Задача не может быть решена, так как все члены разрешающего столбца '
                   'отрицательные')
             self.flag = True
             return True
-        self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
+        if self._showsteps:
+            self.out_tab.print(self.tab, self.basis, self.Cj_arr, self.deltarr, self.qarr)
         self.Cj_arr[qind] = self.f_list[ind + 1]
-        print(f"Вектор A{self.basis[qind]} покидает базис")
-        print(f"Вектор A{ind + 1} вводится в новый базис")
+        if self._showsteps:
+            print(f"Вектор A{self.basis[qind]} покидает базис")
+            print(f"Вектор A{ind + 1} вводится в новый базис")
         self.basis[qind] = ind + 1
-        print(f'Новый базис:(', *list(f'A{i}' for i in self.basis), ')')
-        print('\n')
+        if self._showsteps:
+            print(f'Новый базис:(', *list(f'A{i}' for i in self.basis), ')')
+            print('\n')
         self.rework_tab(qind, ind + 1)
         self.iter += 1
         return False
