@@ -8,7 +8,7 @@ from tabulate import tabulate
 class TravelingSalesman:
     def __init__(self, locarr):
         self.n = len(locarr)
-        self.locarr = locarr.copy()
+        self.locarr = locarr[:]
         print(self.locarr)
         self.best_cost = float('inf')
         self.best_path = []
@@ -115,7 +115,7 @@ class TravelingSalesman:
                 total_cost = current_cost + last_to_first
                 if total_cost < self.best_cost:
                     self.best_cost = total_cost
-                    self.best_path = current_path[:] + [0]  # Add return to start
+                    self.best_path = current_path[:] + [0]
             return
 
         for i in range(self.n):
