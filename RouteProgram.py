@@ -1,3 +1,5 @@
+from importlib.metadata import pass_none
+
 from TSProgram import TravelingSalesman
 from tabulate import tabulate
 
@@ -19,21 +21,25 @@ while True:
     print("Выберите магазин:")
     for i, loc in enumerate(locs):
         print(f"{i+1}. ", loc)
-    print("Для выхода введите 0.")
+    print("Для выхода введите 0.", "Для отправления грузовика напишите 'go' ", sep='\n')
     inp = int(input())
     if inp==0:
         break
     else:
-        actual_locs.append(locs[inp-1])
-        print("Введите вес запрашиваемого груза")
-        weight = int(input())
-        if cur_weight+weight < max_weight:
+        if locs[inp - 1] not in actual_locs:
+            actual_locs.append(locs[inp-1])
+        if inp!="go":
+            print("Введите вес запрашиваемого груза")
+            weight = int(input())
+        else:
+            print("Генерация маршрута...")
+        if cur_weight+weight < max_weight and inp!='go':
             cur_weight+=weight
             continue
         if cur_weight+weight == max_weight:
             cur_weight = 0
             print("Грузовик полностью заполнен. Генерация маршрута...")
-        else:
+        elif cur_weight+weight > max_weight:
             cur_weight=weight
             print("Груз не помещается в грузовик. Данный груз будет отправлен в следующем грузовике. Генерация маршрута...")
         TS = TravelingSalesman(actual_locs)
@@ -48,7 +54,7 @@ while True:
         for i in path:
             print(actual_locs[i], " -> ", end='')
             route_coords.append(coords[i])
-        print('\n')
+        print('\n', "Генерация карты...")
         TS.build_route_multiple_points(route_coords)
         actual_locs.clear()
         actual_locs.append(whouse_loc)
