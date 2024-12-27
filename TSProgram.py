@@ -106,7 +106,7 @@ class TravelingSalesman:
         for i in range(self.n):
             row_min = min(self.cost_matrix[i][j] for j in range(self.n) if i != j)
             bound += row_min
-        return bound / 2
+        return bound
 
     def branch_and_bound(self, level, current_path, current_bound, current_cost):
         if level == self.n - 1:
@@ -120,13 +120,11 @@ class TravelingSalesman:
 
         for i in range(self.n):
             if i not in current_path and self.cost_matrix[current_path[-1]][i] != float('inf'):
-                temp_cost = current_cost + self.cost_matrix[current_path[-1]][i]
 
-                # Calculate new bound
                 temp_bound = current_bound
                 last_city = current_path[-1]
+                temp_cost = current_cost + self.cost_matrix[last_city][i]
 
-                # Adjust the bound by subtracting minimum outgoing edge from the current city
                 row_min = min(
                     (self.cost_matrix[last_city][j] for j in range(self.n) if j not in current_path and j != last_city),
                     default=0
@@ -136,12 +134,11 @@ class TravelingSalesman:
                     default=0
                 )
 
-                temp_bound = temp_bound - row_min - col_min + self.cost_matrix[last_city][i]
+                temp_bound = temp_bound - row_min - col_min
 
-                # Proceed if the estimated cost is better than the best found so far
                 if temp_cost + temp_bound < self.best_cost:
                     current_path.append(i)
-                    self.branch_and_bound(level + 1, current_path, temp_bound, temp_cost)
+                    self.branch_and_bound(level + 1, current_path, temp_bound + self.cost_matrix[last_city][i], temp_cost)
                     current_path.pop()
 
 
